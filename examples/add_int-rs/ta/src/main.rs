@@ -8,7 +8,6 @@ use optee_utee::{
 };
 
 use proto::Command;
-use std::{io::Write, mem::transmute};
 
 #[ta_create]
 fn create() -> Result<()> {
@@ -42,12 +41,12 @@ fn add(a0: i32, a1: i32) -> Result<i32> {
 fn invoke_command(cmd_id: u32, params: &mut Parameters) -> Result<()> {
     trace_println!("[+] TA invoke command");
     let n0 = unsafe { params.0.as_value().unwrap() };
-    let mut r0_ref = unsafe { params.1.as_memref().unwrap() };
+    let mut r0 = unsafe{ params.1.as_value().unwrap() };
 
     match Command::from(cmd_id) {
         Command::Add => {
             let res = add(n0.a() as i32, n0.b() as i32).unwrap();
-            r0_ref.buffer().write(& unsafe{ transmute::<i32, [u8; 4]>(res) });
+            r0.set_a(res as u32);
             Ok(())
         },
         _ => Err(Error::new(ErrorKind::BadParameters)),

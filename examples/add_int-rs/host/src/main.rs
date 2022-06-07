@@ -1,9 +1,7 @@
 use optee_teec::{
-    Context, Operation, Uuid, ParamValue, ParamTmpRef, ParamType, ParamNone,
+    Context, Operation, Uuid, ParamValue, ParamType, ParamNone,
 };
 use proto::{UUID, Command};
-
-use std::mem::transmute;
 
 fn main() -> optee_teec::Result<()> {
     let mut ctx = Context::new()?;
@@ -12,15 +10,14 @@ fn main() -> optee_teec::Result<()> {
 
     let p0 = ParamValue::new(4, 6, ParamType::ValueInput);
 
-    let res = &mut [0u8; 4];
 
-    let r0 = ParamTmpRef::new_output(res);
+    let r0 = ParamValue::new(0, 0, ParamType::ValueOutput);
     let mut operation = Operation::new(0, p0, r0, ParamNone, ParamNone);
 
     session.invoke_command(Command::Add as u32, &mut operation)?;
 
 
-    println!("Success! {}", unsafe{ transmute::<[u8; 4], i32>(*res) });
+    println!("Success! {} + {} = {}", 4, 6, operation.parameters().1.a() as i32);
 
     Ok(())
 }
