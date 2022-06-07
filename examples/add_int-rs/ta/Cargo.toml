@@ -1,0 +1,20 @@
+[package]
+name = "ta"
+version = "0.2.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+libc = { path = "../../../rust/libc" }
+proto = { path = "../proto" }
+optee-utee-sys = { path = "../../../optee-utee/optee-utee-sys" }
+optee-utee = { path = "../../../optee-utee" }
+
+[build_dependencies]
+uuid = { version = "0.8" }
+proto = { path = "../proto" }
+
+[profile.release]
+lto = true
+opt-level = 1
